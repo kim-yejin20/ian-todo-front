@@ -1,32 +1,25 @@
-import { TaskListItem, TaskItemProps } from './TaskListItem';
-import { useState } from 'react';
+import { TaskListItem } from './TaskListItem';
+import { TaskItemProps } from './TaskListItem';
 
-export const TaskList: React.FC<{ tasks: TaskItemProps[] }> = (props) => {
-  const { tasks, setTasks } = props;
+type TaskListProps = {
+  tasks: TaskItemProps[];
+  onDeleteItem: (id: number) => void;
+  onUpdateItem: (inputData: string, id: number) => void;
+  onDoneItem: (id: number, check: boolean) => void;
+};
 
-  const deleteItem = (id: number) => {
-    const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
-  };
-
-  const updateItem = (res) => {
-    console.log('updateItem', res);
-    const newTasks = tasks.map((task) =>
-      task.id === res.id ? { ...task, content: task.content } : task
-    );
-    setTasks(newTasks);
-  };
+export const TaskList: React.FC<TaskListProps> = (props) => {
+  const { tasks, onDeleteItem, onUpdateItem, onDoneItem } = props;
 
   return (
     <div className="w-10/12 h-5/6 space-y-3 overflow-y-scroll">
-      {props.tasks?.map((task) => (
+      {tasks?.map((task) => (
         <TaskListItem
           key={task.id}
           task={task}
-          deleteItem={deleteItem}
-          updateItem={updateItem}
-          // editable={editable}
-          // setEditable={setEditable}
+          onDeleteItem={onDeleteItem}
+          onUpdateItem={onUpdateItem}
+          onDoneItem={onDoneItem}
         />
       ))}
     </div>

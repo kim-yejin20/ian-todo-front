@@ -1,5 +1,11 @@
-import axios from 'axios';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { useState } from 'react';
+
+export type Props = {
+  task: TaskItemProps;
+  onDeleteItem: (id: number) => void;
+  onUpdateItem: (inputData: string, id: number) => void;
+  onDoneItem: (id: number, check: boolean) => void;
+};
 
 export type TaskItemProps = {
   id: number;
@@ -7,41 +13,26 @@ export type TaskItemProps = {
   isCompleted: boolean;
 };
 
-export const TaskListItem: React.FC<{ task: TaskItemProps }> = (props) => {
-  const { deleteItem, updateItem } = props;
+export const TaskListItem: React.FC<Props> = (props) => {
+  const { task, onDeleteItem, onUpdateItem, onDoneItem } = props;
 
-  const [check, setCheck] = useState(props.task.isCompleted);
+  const [check, setCheck] = useState(task.isCompleted);
   const [editable, setEditable] = useState(false);
-  const [inputData, setInputData] = useState(props.task.content);
+  const [inputData, setInputData] = useState(task.content);
 
-  const doneTask = async (check: any) => {
-    await axios.put(`http://localhost:3000/tasks/${props.task.id}`, {
-      isCompleted: !check,
-    });
+  const handlCheckEdit = (data: string, id: number) => {
+    if (editable === true) {
+      onUpdateItem(data, id);
+      setEditable(false);
+      return;
+    } else {
+      setEditable(true);
+    }
+  };
+
+  const handleTestDone = (id: number) => {
     setCheck(!check);
-  };
-
-  const deleteTask = async () => {
-    await axios
-      .delete(`http://localhost:3000/tasks/${props.task.id}`)
-      .then(function (res) {
-        deleteItem(props.task.id);
-      });
-  };
-
-  const updateTask = async () => {
-    await axios
-      .put(`http://localhost:3000/tasks/${props.task.id}`, {
-        content: inputData,
-      })
-      .then(function (res) {
-        updateItem(res.data);
-        setEditable(false);
-      });
-  };
-
-  const changeInput = () => {
-    setEditable(true);
+    onDoneItem(id, check);
   };
 
   return (
@@ -49,7 +40,7 @@ export const TaskListItem: React.FC<{ task: TaskItemProps }> = (props) => {
       <input
         type="checkbox"
         checked={check}
-        onClick={() => doneTask(check)}
+        onChange={() => handleTestDone(task.id)}
         className="w-6 h-6 float-left"
       />
       {editable ? (
@@ -64,14 +55,14 @@ export const TaskListItem: React.FC<{ task: TaskItemProps }> = (props) => {
       )}
       <div className="w-1/6 flex justify-center space-x-4 ">
         <button
-          onClick={editable ? updateTask : changeInput}
-          className="border-2 border-yellow-300 rounded"
+          onClick={() => handlCheckEdit(inputData, task.id)}
+          className="border-2 border-yellow-300 rounded bg-yellow-300 px-1"
         >
           수정
         </button>
         <button
-          onClick={deleteTask}
-          className="border-2 border-yellow-300 rounded"
+          onClick={() => onDeleteItem(task.id)}
+          className="border-2 border-yellow-300 rounded bg-yellow-300 px-1"
         >
           삭제
         </button>
