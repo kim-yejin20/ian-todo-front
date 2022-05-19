@@ -15,7 +15,7 @@ export type TaskItemProps = {
 
 export const TaskListItem: React.FC<Props> = (props) => {
   const { task, onDeleteItem, onUpdateItem, onDoneItem } = props;
-
+ 
   const [check, setCheck] = useState(task.isCompleted);
   const [editable, setEditable] = useState(false);
   const [inputData, setInputData] = useState(task.content);
