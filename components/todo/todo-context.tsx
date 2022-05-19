@@ -1,41 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import axios from 'axios';
 import { createContext } from 'react';
+import { TaskItemProps } from './TaskListItem';
 
-// context로 관리할 것들?
-// task, setTask
-// (input, setInput) -> create, update 둘 다 있는데 이걸 통합?해서 쓸 수 있을지
-// editable, setEditable
-// ondelete, onupdate, ondone 함수
+export type TaskProviderProps = {
+  tasks: TaskItemProps[];
+  setTasks: (task: TaskItemProps[]) => void;
+  CreateTask: (content: string) => void;
+  DeleteTask: (id: number) => void;
+  UpdateTask: (id: number, content: string) => void;
+  DoneTask: (id: number, check: boolean) => void;
+};
 
-type Props = {};
-
-export const TaskContext = createContext({
-  state: { task: '' },
-  action: {
-    setTasks: () => {},
-    onCreateItem: () => {},
-    onDeleteItem: () => {},
-    onUpdateItem: () => {},
-  },
+export const TaskContext = createContext<TaskProviderProps>({
+  tasks: [],
+  setTasks: () => {},
+  CreateTask: () => {},
+  DeleteTask: () => {},
+  UpdateTask: () => {},
+  DoneTask: () => {},
 });
 
-export const TaskProvider: React.FC<Props> = (props) => {
-  const [tasks, setTasks] = useState([]);
-  const [inputData, setInputData] = useState('');
-  const [editable, setEditable] = useState(false);
+export const TaskProvider: React.FC<TaskProviderProps> = (props) => {
+  const [tasks, setTasks] = useState<TaskItemProps[]>([]);
 
-  function onCreateItem(input: string) {}
+  useEffect(() => {
+    async function getTasks() {
+      const newTasks = await axios.get('http://localhost:3000/tasks');
+      setTasks(newTasks.data);
+    }
+    getTasks();
+  }, []);
 
-  function onDeleteItem() {}
-
-  function onUpdateItem() {}
-
-  const value = {
-    state: { tasks, inputData, editable },
-    action: { setTasks, setInputData, setEditable, onCreateItem },
+  const CreateTask = async (content: string) => {
+    const res = await axios.post('http://localhost:3000/tasks', {
+      content,
+    });
+    setTasks([res.data, ...tasks]);
   };
 
+  async function DeleteTask(id: number) {
+    await axios.delete(`http://localhost:3000/tasks/${id}`);
+    const newTasks = tasks.filter((task) => task.id !== id);
+    setTasks(newTasks);
+  }
+
+  async function UpdateTask(id: number, content: string) {
+    const res = await axios.put(`http://localhost:3000/tasks/${id}`, {
+      content: content,
+    });
+
+    const newTasks = tasks.map((task) =>
+      task.id === res.data.id ? { ...task, content: task.content } : task
+    );
+    setTasks(newTasks);
+  }
+
+  async function DoneTask(id: number, check: boolean) {
+    const res = await axios.put(`http://localhost:3000/tasks/${id}`, {
+      isCompleted: !check,
+    });
+    const newTasks = tasks.map((task) =>
+      task.id === res.data.id
+        ? { ...task, isCompleted: task.isCompleted }
+        : task
+    );
+    setTasks(newTasks);
+  }
+
   return (
-    <TaskContext.Provider value={value}>{props.children}</TaskContext.Provider>
+    <TaskContext.Provider
+      value={{
+        tasks,
+        setTasks,
+        CreateTask,
+        DeleteTask,
+        UpdateTask,
+        DoneTask,
+      }}
+    >
+      {props.children}
+    </TaskContext.Provider>
   );
 };

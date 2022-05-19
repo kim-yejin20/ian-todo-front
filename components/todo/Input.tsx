@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { TaskContext } from './todo-context';
 
-type InputProps = {
-  onCreateItem: (inputData: string) => void;
-};
+export const Input: React.FC = (props) => {
+  // const { onCreateItem } = props;
 
-export const Input: React.FC<InputProps> = (props) => {
-  const { onCreateItem } = props;
+  const { CreateTask } = useContext(TaskContext);
 
   const [inputData, setInputData] = useState<string>('');
 
@@ -13,9 +12,9 @@ export const Input: React.FC<InputProps> = (props) => {
     setInputData(e.target.value);
   };
 
-  const handleCreateButton = (inputData: string) => {
-    if (inputData === '') return alert('내용을 입력해주세요');
-    onCreateItem(inputData);
+  const handleCreateButton = (content: string) => {
+    if (content === '') return alert('내용을 입력해주세요');
+    CreateTask(content);
     setInputData('');
   };
 

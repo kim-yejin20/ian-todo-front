@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { TaskContext } from './todo-context';
 
 export type Props = {
   task: TaskItemProps;
-  onDeleteItem: (id: number) => void;
-  onUpdateItem: (inputData: string, id: number) => void;
-  onDoneItem: (id: number, check: boolean) => void;
 };
 
 export type TaskItemProps = {
@@ -14,15 +12,17 @@ export type TaskItemProps = {
 };
 
 export const TaskListItem: React.FC<Props> = (props) => {
-  const { task, onDeleteItem, onUpdateItem, onDoneItem } = props;
- 
+  const { task } = props;
+
   const [check, setCheck] = useState(task.isCompleted);
   const [editable, setEditable] = useState(false);
   const [inputData, setInputData] = useState(task.content);
 
-  const handlCheckEdit = (data: string, id: number) => {
+  const { UpdateTask, DeleteTask, DoneTask } = useContext(TaskContext);
+
+  const handlCheckEdit = (id: number, data: string) => {
     if (editable === true) {
-      onUpdateItem(data, id);
+      UpdateTask(id, data);
       setEditable(false);
       return;
     } else {
@@ -30,9 +30,13 @@ export const TaskListItem: React.FC<Props> = (props) => {
     }
   };
 
-  const handleTestDone = (id: number) => {
+  const handleCheckDone = (id: number) => {
     setCheck(!check);
-    onDoneItem(id, check);
+    DoneTask(id, check);
+  };
+
+  const handleDelete = (id: number) => {
+    DeleteTask(id);
   };
 
   return (
@@ -40,7 +44,7 @@ export const TaskListItem: React.FC<Props> = (props) => {
       <input
         type="checkbox"
         checked={check}
-        onChange={() => handleTestDone(task.id)}
+        onChange={() => handleCheckDone(task.id)}
         className="w-6 h-6 float-left"
       />
       {editable ? (
@@ -55,13 +59,13 @@ export const TaskListItem: React.FC<Props> = (props) => {
       )}
       <div className="w-1/6 flex justify-center space-x-4 ">
         <button
-          onClick={() => handlCheckEdit(inputData, task.id)}
+          onClick={() => handlCheckEdit(task.id, inputData)}
           className="border-2 border-yellow-300 rounded bg-yellow-300 px-1"
         >
           수정
         </button>
         <button
-          onClick={() => onDeleteItem(task.id)}
+          onClick={() => handleDelete(task.id)}
           className="border-2 border-yellow-300 rounded bg-yellow-300 px-1"
         >
           삭제
