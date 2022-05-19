@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { Input } from './Input';
 import { TaskList } from './TaskList';
 import { TaskTitle } from './TaskTitle';
 import { TaskItemProps } from './TaskListItem';
+import { TaskContext, TaskProvider } from './todo-context';
 
 export const TaskView: React.FC = () => {
   const [tasks, setTasks] = useState<TaskItemProps[]>([]);
 
+  const { state, action } = useContext(TaskContext);
+
   useEffect(() => {
     async function getTasks() {
       const newTasks = await axios.get('http://localhost:3000/tasks');
-      setTasks(newTasks.data);
+      action.setTasks(newTasks.data);
     }
     getTasks();
   }, []);
@@ -21,13 +24,13 @@ export const TaskView: React.FC = () => {
       content: inputData,
     });
 
-    setTasks([res.data, ...tasks]);
+    action.setTasks([res.data, ...tasks]);
   };
 
   const onDeleteItem = async (id: number) => {
     await axios.delete(`http://localhost:3000/tasks/${id}`);
     const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
+    action.setTasks(newTasks);
   };
 
   const onUpdateItem = async (inputData: string, id: number) => {
@@ -38,7 +41,7 @@ export const TaskView: React.FC = () => {
     const newTasks = tasks.map((task) =>
       task.id === res.data.id ? { ...task, content: task.content } : task
     );
-    setTasks(newTasks);
+    action.setTasks(newTasks);
   };
 
   const onDoneItem = async (id: number, check: boolean) => {
@@ -49,14 +52,16 @@ export const TaskView: React.FC = () => {
 
   return (
     <div className="rounded-3xl bg-white h-5/6 w-4/5 flex flex-col items-center py-10 space-y-10">
-      <TaskTitle />
-      <Input onCreateItem={onCreateItem} />
-      <TaskList
-        tasks={tasks}
-        onDeleteItem={onDeleteItem}
-        onUpdateItem={onUpdateItem}
-        onDoneItem={onDoneItem}
-      />
+      <TaskProvider>
+        <TaskTitle />
+        <Input onCreateItem={onCreateItem} />
+        <TaskList
+          tasks={tasks}
+          onDeleteItem={onDeleteItem}
+          onUpdateItem={onUpdateItem}
+          onDoneItem={onDoneItem}
+        />
+      </TaskProvider>
     </div>
   );
 };
