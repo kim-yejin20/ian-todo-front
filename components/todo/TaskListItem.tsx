@@ -40,33 +40,36 @@ export const TaskListItem: React.FC<Props> = (props) => {
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      <input
-        type="checkbox"
-        checked={check}
-        onChange={() => handleCheckDone(task.id)}
-        className="w-6 h-6 float-left"
-      />
-      {editable ? (
+    <div className="items-center px-2 md:flex space-y-3">
+      <div className="flex flex-row w-full space-x-2 ">
         <input
-          type="text"
-          value={inputData}
-          onChange={(e) => setInputData(e.target.value)}
-          className="w-5/6 break-words border-2 border-yellow-300"
-        ></input>
-      ) : (
-        <div className="w-5/6 break-words">{inputData}</div>
-      )}
-      <div className="w-1/6 flex justify-center space-x-4 ">
+          type="checkbox"
+          checked={check}
+          onChange={() => handleCheckDone(task.id)}
+          className="w-6 h-6 float-left flex-shrink-0"
+        />
+        {editable ? (
+          <input
+            type="text"
+            value={inputData}
+            onChange={(e) => setInputData(e.target.value)}
+            className="w-full md:w-4/5 break-all border-2 border-yellow-300"
+          ></input>
+        ) : (
+          <div className="w-full md:w-5/6 break-all ">{inputData}</div>
+        )}
+      </div>
+
+      <div className="flex space-x-3 justify-end">
         <button
           onClick={() => handlCheckEdit(task.id, inputData)}
-          className="border-2 border-yellow-300 rounded bg-yellow-300 px-1"
+          className="border-1 border-yellow-300 rounded bg-yellow-300 px-1 flex-shrink-0 text-base"
         >
           수정
         </button>
         <button
           onClick={() => handleDelete(task.id)}
-          className="border-2 border-yellow-300 rounded bg-yellow-300 px-1"
+          className="border-1 border-yellow-300 rounded bg-yellow-300 px-1 flex-shrink-0 text-base"
         >
           삭제
         </button>

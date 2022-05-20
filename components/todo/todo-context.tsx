@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  ReactElement,
+  useEffect,
+  useState,
+} from 'react';
 
 import axios from 'axios';
 import { createContext } from 'react';
 import { TaskItemProps } from './TaskListItem';
 
-export type TaskProviderProps = {
+export type TaskContextProps = {
   tasks: TaskItemProps[];
+  children?: ReactElement;
   setTasks: (task: TaskItemProps[]) => void;
   CreateTask: (content: string) => void;
   DeleteTask: (id: number) => void;
@@ -13,7 +19,7 @@ export type TaskProviderProps = {
   DoneTask: (id: number, check: boolean) => void;
 };
 
-export const TaskContext = createContext<TaskProviderProps>({
+export const TaskContext = createContext<TaskContextProps>({
   tasks: [],
   setTasks: () => {},
   CreateTask: () => {},
@@ -22,7 +28,7 @@ export const TaskContext = createContext<TaskProviderProps>({
   DoneTask: () => {},
 });
 
-export const TaskProvider: React.FC<TaskProviderProps> = (props) => {
+export const TaskProvider: React.FC<PropsWithChildren<{}>> = (props) => {
   const [tasks, setTasks] = useState<TaskItemProps[]>([]);
 
   useEffect(() => {

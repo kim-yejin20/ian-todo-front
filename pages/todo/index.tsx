@@ -11,7 +11,7 @@ const TodoHome: NextPage = (props) => {
         <meta name="description" content="Ian's TO DO project" />
       </Head>
       <TaskProvider>
-        <div className="h-screen flex flex-col items-center justify-center bg-green-700">
+        <div className="h-screen flex flex-col items-center justify-center bg-green-700  ">
           <TaskView />
         </div>
       </TaskProvider>

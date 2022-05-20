@@ -8,7 +8,7 @@ export const TaskView: React.FC = () => {
   const { tasks } = useContext(TaskContext);
 
   return (
-    <div className="rounded-3xl bg-white h-5/6 w-4/5 flex flex-col items-center py-10 space-y-10">
+    <div className="md:rounded-3xl bg-white md:h-5/6 md:w-5/6 rounded-none h-full w-full flex flex-col items-center py-10 space-y-7">
       <TaskTitle />
       <Input />
       <TaskList tasks={tasks} />
