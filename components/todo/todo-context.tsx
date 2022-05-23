@@ -65,6 +65,8 @@ export const TaskProvider: React.FC<PropsWithChildren<{}>> = (props) => {
   //   }
   // }
 
+  // 수정중
+
   const CreateTask = async (content: string) => {
     const { data } = await client.mutate({
       mutation: gql`
